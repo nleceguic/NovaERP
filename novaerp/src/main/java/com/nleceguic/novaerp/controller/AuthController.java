@@ -35,11 +35,11 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
 
             User user = userService.findByEmail(request.getEmail());
-            Set<String> roles = user.getRoles().stream().map(r -> r.getName())
-                    .collect(java.util.stream.Collectors.toSet());
+            Set<String> roles = user.getRoles().stream().map(r -> r.getName()).collect(java.util.stream.Collectors.toSet());
             String token = jwtUtil.generateToken(user.getEmail(), roles);
 
             SessionAudit audit = new SessionAudit();
@@ -47,10 +47,27 @@ public class AuthController {
             audit.setIpAddress(httpRequest.getRemoteAddr());
             audit.setLoginTime(LocalDateTime.now());
             auditRepository.save(audit);
-
+        
             return ResponseEntity.ok(new AuthResponse(token, user.getEmail()));
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Credenciales inválidas");
         }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        User user = userService.registerUser(
+            request.getNombre(),
+            request.getEmail(),
+            request.getPassword(),
+            request.getRole()
+        );
+        return ResponseEntity.ok("Usuario registrado exitosamente");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestParam String email) {
+        // Falta actualizar la sesion de SessionAudit.
+        return ResponseEntity.ok("Usuario desconectado exitosamente");
     }
 }
