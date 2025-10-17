@@ -15,9 +15,9 @@ public class JwtUtil {
 
     private final Key key = Keys.hmacShaKeyFor(secret.getBytes());
 
-    public String generateToken(String username, Set<String> roles) {
+    public String generateToken(String email, Set<String> roles) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(email)
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
@@ -25,7 +25,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String getUsername(String token) {
+    public String getEmail(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()

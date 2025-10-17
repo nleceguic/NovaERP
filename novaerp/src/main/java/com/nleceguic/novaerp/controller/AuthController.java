@@ -29,16 +29,28 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
-    private final SessionAuditRepository sessionAuditRepository;
-
+    private final SessionAuditRepository auditRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         try {
             authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-            );
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
+            User user = userService.findByEmail(request.getEmail());
+            Set<String> roles = user.getRoles().stream().map(r -> r.getName())
+                    .collect(java.util.stream.Collectors.toSet());
+            String token = jwtUtil.generateToken(user.getEmail(), roles);
+
+            SessionAudit audit = new SessionAudit();
+            audit.setEmail(user.getEmail());
+            audit.setIpAddress(httpRequest.getRemoteAddr());
+            audit.setLoginTime(LocalDateTime.now());
+            auditRepository.save(audit);
+
+            return ResponseEntity.ok(new AuthResponse(token, user.getEmail()));
+        } catch (AuthenticationException e) {
+            throw new BadCredentialsException("Credenciales inválidas");
         }
     }
 }
