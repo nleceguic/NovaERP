@@ -1,0 +1,16 @@
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\config\DataInitializer.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\config\JwtAuthenticationFilter.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\config\SecurityConfig.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\controller\AuthController.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\dto\AuthResponse.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\dto\LoginRequest.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\dto\RegisterRequest.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\entity\Role.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\entity\SessionAudit.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\entity\User.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\NovaerpApplication.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\repository\RoleRepository.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\repository\SessionAuditRepository.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\repository\UserRepository.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\service\UserService.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\util\JwtUtil.java
