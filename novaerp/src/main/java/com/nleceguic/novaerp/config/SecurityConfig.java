@@ -1,6 +1,5 @@
 package com.nleceguic.novaerp.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,13 +9,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.nleceguic.novaerp.service.UserService;
+import com.nleceguic.novaerp.util.JwtUtil;
+
 @Configuration
-@RequiredArgsConstructor
 public class SecurityConfig {
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtil jwtUtil, UserService userService) {
+        return new JwtAuthenticationFilter(jwtUtil, userService);
+    }
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
@@ -29,7 +33,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
