@@ -42,4 +42,9 @@ public class JwtUtil {
             return false;
         }
     }
+
+    public Date getIssuedAt(String token) {
+    return Jwts.parserBuilder().setSigningKey(secretKey).build()
+               .parseClaimsJws(token).getBody().getIssuedAt();
+}
 }
