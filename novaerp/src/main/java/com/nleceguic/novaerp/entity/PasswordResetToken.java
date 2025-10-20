@@ -2,6 +2,7 @@ package com.nleceguic.novaerp.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,7 +14,10 @@ public class PasswordResetToken {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String token;
+    private String tokenId;
+
+    @Column(nullable = false)
+    private String tokenHash;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
