@@ -1,0 +1,9 @@
+package com.nleceguic.novaerp.dto;
+
+import lombok.Data;
+
+@Data
+public class ResetPasswordRequest {
+    private String token;
+    private String newPassword;
+}

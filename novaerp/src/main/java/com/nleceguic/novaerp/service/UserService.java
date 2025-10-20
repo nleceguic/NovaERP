@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,10 @@ public class UserService implements UserDetailsService {
                         }
                 });
                 return userRepository.save(user);
+        }
+
+        public List<User> findAllUsers() {
+                return userRepository.findAll();
         }
 
 }

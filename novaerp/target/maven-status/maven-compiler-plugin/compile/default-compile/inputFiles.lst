@@ -2,9 +2,11 @@ C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\nov
 C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\config\JwtAuthenticationFilter.java
 C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\config\SecurityConfig.java
 C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\controller\AuthController.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\controller\UserController.java
 C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\dto\AuthResponse.java
 C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\dto\LoginRequest.java
 C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\dto\RegisterRequest.java
+C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\dto\UserDTO.java
 C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\entity\Role.java
 C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\entity\SessionAudit.java
 C:\Users\usuari\Documents\GitHub\NovaERP\novaerp\src\main\java\com\nleceguic\novaerp\entity\User.java

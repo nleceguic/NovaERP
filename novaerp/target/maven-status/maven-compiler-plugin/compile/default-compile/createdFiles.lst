@@ -1,10 +1,12 @@
 com\nleceguic\novaerp\config\JwtAuthenticationFilter.class
 com\nleceguic\novaerp\entity\SessionAudit.class
+com\nleceguic\novaerp\dto\UserDTO.class
 com\nleceguic\novaerp\entity\User.class
 com\nleceguic\novaerp\service\UserService$1.class
 com\nleceguic\novaerp\config\SecurityConfig.class
 com\nleceguic\novaerp\controller\AuthController.class
 com\nleceguic\novaerp\NovaerpApplication.class
+com\nleceguic\novaerp\controller\UserController.class
 com\nleceguic\novaerp\config\DataInitializer.class
 com\nleceguic\novaerp\dto\AuthResponse.class
 com\nleceguic\novaerp\repository\UserRepository.class
