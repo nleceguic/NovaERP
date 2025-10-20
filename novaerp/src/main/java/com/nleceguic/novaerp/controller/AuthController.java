@@ -8,6 +8,8 @@ import com.nleceguic.novaerp.entity.User;
 import com.nleceguic.novaerp.repository.SessionAuditRepository;
 import com.nleceguic.novaerp.service.UserService;
 import com.nleceguic.novaerp.util.JwtUtil;
+import com.nleceguic.novaerp.util.SimpleRateLimiter;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +17,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import com.nleceguic.novaerp.entity.Pair;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -24,8 +27,11 @@ import java.util.Set;
 import com.nleceguic.novaerp.dto.ForgotPasswordRequest;
 import com.nleceguic.novaerp.dto.ResetPasswordRequest;
 import com.nleceguic.novaerp.service.PasswordResetService;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+//import org.springframework.mail.SimpleMailMessage;
+//import org.springframework.mail.javamail.JavaMailSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/auth")
@@ -34,10 +40,13 @@ public class AuthController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
+    //private final PasswordEncoder passwordEncoder;
     private final SessionAuditRepository auditRepository;
     private final PasswordResetService passwordResetService;
-    private final JavaMailSender mailSender;
+    //private final JavaMailSender mailSender;
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private final SimpleRateLimiter emailLimiter = new SimpleRateLimiter(3, Duration.ofHours(1));
+    private final SimpleRateLimiter ipLimiter = new SimpleRateLimiter(10, Duration.ofHours(1));
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
@@ -79,23 +88,32 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest req) {
-        String token = passwordResetService.createPasswordResetToken(req.getEmail(), 60);
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest req, HttpServletRequest httpReq) {
+        String email = req.getEmail();
+        String ip = httpReq.getRemoteAddr();
 
-        String resetUrl = "http://localhost:8080/auth/reset-password?token=" + token;
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(req.getEmail());
-        message.setSubject("NovaERP - Restablecer contraseña");
-        message.setText("Para restablecer tu contraseña sigue el siguiente enlace:\n" + resetUrl
-                + "\n\nSi no solicitaste este cambio ignora este correo.");
-        mailSender.send(message);
+        if (!emailLimiter.isAllowed(email) || !ipLimiter.isAllowed(ip)) {
+            return ResponseEntity.status(429).body("Too many requests. Try later.");
+        }
 
-        return ResponseEntity.ok("Mensaje de restablecimiento enviado si el email existe");
+        try {
+            Pair p = passwordResetService.createPasswordResetToken(email, 60);
+            String resetUrl = "http://localhost:3000/reset-password?tokenId=" + p.tokenId + "&token=" + p.tokenSecret;
+            logger.info("Password reset link for {}: {}", email, resetUrl);
+        } catch (IllegalArgumentException e) {
+            logger.info("Password reset requested for unknown email: {}", email);
+        }
+
+        return ResponseEntity.ok("Si el email existe, se ha enviado un enlace para restablecer la contraseña.");
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest req) {
-        passwordResetService.resetPassword(req.getToken(), req.getNewPassword());
-        return ResponseEntity.ok("Contraseña restablecida exitosamente");
+        try {
+            passwordResetService.resetPassword(req.getTokenId(), req.getToken(), req.getNewPassword());
+            return ResponseEntity.ok("Contraseña actualizada correctamente");
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 }

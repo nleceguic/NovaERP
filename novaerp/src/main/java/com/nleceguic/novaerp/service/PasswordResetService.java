@@ -7,7 +7,7 @@ import com.nleceguic.novaerp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import com.nleceguic.novaerp.entity.Pair;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -61,15 +61,5 @@ public class PasswordResetService {
         userRepository.save(user);
         prt.setUsed(true);
         tokenRepository.save(prt);
-    }
-
-    public static class Pair {
-        public final String tokenId;
-        public final String tokenSecret;
-
-        public Pair(String tokenId, String tokenSecret) {
-            this.tokenId = tokenId;
-            this.tokenSecret = tokenSecret;
-        }
     }
 }
