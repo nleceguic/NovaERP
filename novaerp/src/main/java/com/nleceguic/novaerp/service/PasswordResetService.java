@@ -19,41 +19,57 @@ public class PasswordResetService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public String createPasswordResetToken(String email, int expireMinutes) {
+    public Pair createPasswordResetToken(String email, int expireMinutes) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("No existe usuario con ese email"));
         tokenRepository.deleteAllByUserId(user.getId());
 
-        String token = UUID.randomUUID().toString();
+        String tokenId = UUID.randomUUID().toString();
+        String tokenSecret = UUID.randomUUID().toString();
+        String hash = passwordEncoder.encode(tokenSecret);
+
         PasswordResetToken prt = new PasswordResetToken();
-        prt.setToken(token);
+        prt.setTokenId(tokenId);
+        prt.setTokenHash(hash);
         prt.setUser(user);
         prt.setExpiryDate(LocalDateTime.now().plusMinutes(expireMinutes));
         prt.setUsed(false);
         tokenRepository.save(prt);
 
-        return token;
+        return new Pair(tokenId, tokenSecret);
     }
 
-    public PasswordResetToken validatePasswordResetToken(String token) {
-        Optional<PasswordResetToken> opt = tokenRepository.findByToken(token);
+    public PasswordResetToken validateTokenAndGet(String tokenId, String tokenSecret) {
+        Optional<PasswordResetToken> opt = tokenRepository.findByTokenId(tokenId);
         if (opt.isEmpty())
             throw new IllegalArgumentException("Token inválido");
         PasswordResetToken prt = opt.get();
         if (prt.isUsed())
-            throw new IllegalArgumentException("Token ya fue utilizado");
+            throw new IllegalArgumentException("Token ya usado");
         if (prt.getExpiryDate().isBefore(LocalDateTime.now()))
             throw new IllegalArgumentException("Token expirado");
+        if (!passwordEncoder.matches(tokenSecret, prt.getTokenHash()))
+            throw new IllegalArgumentException("Token inválido");
 
         return prt;
     }
 
-    public void resetPassword(String token, String newPassword) {
-        PasswordResetToken prt = validatePasswordResetToken(token);
+    public void resetPassword(String tokenId, String tokenSecret, String newPassword) {
+        PasswordResetToken prt = validateTokenAndGet(tokenId, tokenSecret);
         User user = prt.getUser();
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         prt.setUsed(true);
         tokenRepository.save(prt);
+    }
+
+    public static class Pair {
+        public final String tokenId;
+        public final String tokenSecret;
+
+        public Pair(String tokenId, String tokenSecret) {
+            this.tokenId = tokenId;
+            this.tokenSecret = tokenSecret;
+        }
     }
 }
