@@ -1,6 +1,7 @@
 package com.nleceguic.novaerp.config;
 
 import com.nleceguic.novaerp.util.JwtUtil;
+import com.nleceguic.novaerp.entity.User;
 import com.nleceguic.novaerp.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,6 +16,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 //@Component
 @RequiredArgsConstructor
@@ -46,6 +50,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UserDetails userDetails = userService.loadUserByUsername(email);
 
             if (jwtUtil.validateToken(token)) {
+                Date issuedAt  = jwtUtil.getIssuedAt(token);
+                LocalDateTime tokenIat = issuedAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+                User userEntity = userService.findByEmail(email);
+                LocalDateTime pwdChanged = userEntity.getPasswordChangedAt();
+
+                if (pwdChanged != null && tokenIat.isBefore(pwdChanged)) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,

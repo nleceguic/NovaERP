@@ -44,7 +44,7 @@ public class JwtUtil {
     }
 
     public Date getIssuedAt(String token) {
-    return Jwts.parserBuilder().setSigningKey(secretKey).build()
-               .parseClaimsJws(token).getBody().getIssuedAt();
-}
+        return Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token).getBody().getIssuedAt();
+    }
 }
